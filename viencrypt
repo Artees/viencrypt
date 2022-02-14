@@ -49,15 +49,10 @@ then
     exit 1
 fi
 
-# prompt for password; don't show typing
-stty -echo
-read -p "Password: " passw; echo
-stty echo
-
 # decrypt into the tmp file
 if [ -f "$filename" ]
 then
-    echo "$passw" | gpg -q -d --batch --passphrase-fd 0 "$filename" > $tmp
+    gpg -q -d --default-recipient-self "$filename" > $tmp
     if [ $? != 0 ]; then
         # if gpg didn't work, exit
         $rm $tmp
@@ -81,7 +76,7 @@ then
     chmod +w $tmp
     $rm $tmp
 else
-    echo "$passw" | gpg -q -c --batch --passphrase-fd 0 --output "$filename" --yes --force-mdc $tmp
+    gpg -q -e --default-recipient-self --output "$filename" --yes $tmp
     $rm $tmp
     if [ $? != 0 ]; then
         # if gpg didn't work, exit
